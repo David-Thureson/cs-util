@@ -176,5 +176,56 @@ public static class Format
         }
     }
 
+    public static string RemoveEnding(string value, string matchEnding, bool ignoreCase, string? context = null)
+    {
+        Debug.Assert(value != null, $"{Program.ContextPrefix(context)}Value is null.");
+        Debug.Assert(matchEnding != null, $"{Program.ContextPrefix(context)}Match ending is null.");
+        Debug.Assert(matchEnding.Length > 0, $"{Program.ContextPrefix(context)}Match ending is blank.");
+
+        StringComparison comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+        if (value.Length == 0 || !value.EndsWith(matchEnding, comparison))
+        {
+            return value;
+        }
+        return value.Substring(0, value.Length - matchEnding.Length);
+    }
+
+    public static string RemoveEndingOrFail(string value, string matchEnding, bool ignoreCase, string? context = null)
+    {
+        Debug.Assert(value != null, $"{Program.ContextPrefix(context)}Value is null.");
+        Debug.Assert(value.Length > 0, $"{Program.ContextPrefix(context)}Value is blank.");
+        Debug.Assert(matchEnding != null, $"{Program.ContextPrefix(context)}Match ending is null.");
+        Debug.Assert(matchEnding.Length > 0, $"{Program.ContextPrefix(context)}Match ending is blank.");
+        StringComparison comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+        Debug.Assert(value.EndsWith(matchEnding, comparison), $"{Program.ContextPrefix(context)}Value \"{value}\" does not end with \"{matchEnding} (ignoreCase = {ignoreCase}).");
+
+        return value.Substring(0, value.Length - matchEnding.Length);
+    }
+
+    public static string ReplaceEnding(string value, string matchEnding, string newEnding, bool ignoreCase, string? context = null)
+    {
+        Debug.Assert(value != null, $"{Program.ContextPrefix(context)}Value is null.");
+        Debug.Assert(matchEnding != null, $"{Program.ContextPrefix(context)}Match ending is null.");
+        Debug.Assert(matchEnding.Length > 0, $"{Program.ContextPrefix(context)}Match ending is blank.");
+        Debug.Assert(newEnding != null, $"{Program.ContextPrefix(context)}New ending is null.");
+
+        string endingRemoved = RemoveEnding(value, matchEnding, ignoreCase, context);
+        return endingRemoved.Length < value.Length
+            ? $"{endingRemoved}{newEnding}"
+            : value;
+    }
+
+    public static string ReplaceEndingOrFail(string value, string matchEnding, string newEnding, bool ignoreCase, string? context = null)
+    {
+        Debug.Assert(value != null, $"{Program.ContextPrefix(context)}Value is null.");
+        Debug.Assert(value.Length > 0, $"{Program.ContextPrefix(context)}Value is blank.");
+        Debug.Assert(matchEnding != null, $"{Program.ContextPrefix(context)}Match ending is null.");
+        Debug.Assert(matchEnding.Length > 0, $"{Program.ContextPrefix(context)}Match ending is blank.");
+        Debug.Assert(newEnding != null, $"{Program.ContextPrefix(context)}New ending is null.");
+
+        string endingRemoved = RemoveEndingOrFail(value, matchEnding, ignoreCase, context);
+        return $"{endingRemoved}{newEnding}";
+    }
+
 }
 

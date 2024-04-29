@@ -12,7 +12,7 @@ namespace Util
             // Parse.Test();
             // NumberList.TryIntProgressionAdd();
             // FileName.Go();
-            SQL.Go();
+            // SQL.Go();
             // Format.Try();
 
             Console.WriteLine("Util.Program.Main() - done");

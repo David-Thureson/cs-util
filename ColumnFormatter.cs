@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +19,42 @@ namespace Util
         List<List<string>> values = new();
         List<Alignment> alignments = new();
         int colCount = 0;
+
+        public static void WriteGroupAndCount<T, TKey>(string? label, Func<T, TKey> keySelector, IEnumerable<T> entries)
+        {
+            WriteToConsole(label, "\t", entries
+                .GroupBy( keySelector)
+                .OrderBy(g => g.Key)
+                .Select(g => $"{g.Key}\t{g.Count():n}"));
+        }
+
+        public static void WriteToConsole(string? label, string columnDelimiter, IEnumerable<string> rows)
+        {
+            Debug.Assert(columnDelimiter.Length > 0);
+
+            ColumnFormatter colFmt = new();
+            foreach (string row in rows)
+            {
+                string[] splits = row.Split(columnDelimiter);
+                colFmt.AddRow(splits);
+            }
+
+            // Right-align any columns that are all numeric.
+            for (int colIndex = 0; colIndex < colFmt.colCount; colIndex++)
+            {
+                if (colFmt.values.All(row => row.Count <= colIndex || double.TryParse(row[colIndex], out double d)))
+                {
+                    colFmt.alignments[colIndex] = Alignment.Right;
+                }
+            }
+
+            int indent = label != null ? 1 : 0;
+            StringBuilder sb = new();
+            colFmt.AddAlignedValues(sb, indent, "  ", true);
+
+            if (label != null) WriteLine(label);
+            WriteLine(sb);
+        }
 
         public void AddRow(params string[] rowValues)
         {
